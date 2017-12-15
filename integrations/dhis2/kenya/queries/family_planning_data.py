@@ -36,8 +36,8 @@ from creds import DHIS2_KENYA_USERNAME, DHIS2_KENYA_PASSWORD
 
 
 DATA_DIR = os.path.dirname(os.path.realpath(__file__)) + '/../source_data/'
-ORG_UNITS_DATA = DATA_DIR + 'organisationUnits/all_level_3.csv'
-INDICATORS_DATA = glob(DATA_DIR + 'indicators/*')
+ORG_UNITS_DATA = DATA_DIR + 'organisationUnits/all_level_2.csv'
+INDICATORS_DATA = glob(DATA_DIR + 'indicators/*.json')
 results = {
     'status': '',
     'headers': '',
@@ -180,14 +180,22 @@ def run(org_unit_ids, indicator_ids):
 
 if __name__ == '__main__':
     try:
+        print('Querying API and saving files...')
         org_units, indicators, org_units_all_data, indicators_all_data = \
             load_data()
+        i = 0
+        a_tenth = len(org_units) / 10
+        next_tenth = a_tenth
         for ou in org_units:
             result = run(ou, indicators)
             # result = format_csv(result)
             # log(result)
             save(result)
-
+            if i > next_tenth:
+                print(str(i / len(org_units) * 10)[:2] + '% complete.')
+                next_tenth = next_tenth + a_tenth
+            i += 1
+        print('Complete.')
         # DEBUG
         # TEST_DATA = DATA_DIR + 'organisationUnits/test.csv'
         # test = pd.read_csv(TEST_DATA)
